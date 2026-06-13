@@ -1,9 +1,9 @@
 <template>
   <section class="panel">
     <header class="panel-header">
-      <h2>Grupo E - Posiciones al final de fase</h2>
+      <h2>Primera Fase - Posiciones del Grupo E</h2>
       <p class="panel-sub">
-        Predice el ranking (1º..4º)
+        Predice el ranking al final de la fase de grupos.
       </p>
     </header>
 
@@ -88,29 +88,89 @@
       <div v-else-if="leaderboard.length === 0" class="state-msg">Sin datos todavía.</div>
       <ul v-else class="list">
         <li v-for="row in leaderboard" :key="row.userId">
-          <span class="pos">{{ row.position }}</span>
-          <span class="user">{{ row.userName }}</span>
-          <strong class="score">{{ row.score }}</strong>
-        
-          <div v-if="!isAdmin" class="row-body">
-            <div class="team-pos">
-              <span>1º</span>
-              <strong>{{ row.pos1_codigo_fifa || '—' }}</strong>
-            </div>
-            <div class="team-pos">
-              <span>2º</span>
-              <strong>{{ row.pos2_codigo_fifa || '—' }}</strong>
-            </div>
-            <div class="team-pos">
-              <span>3º</span>
-              <strong>{{ row.pos3_codigo_fifa || '—' }}</strong>
-            </div>
-            <div class="team-pos">
-              <span>4º</span>
-              <strong>{{ row.pos4_codigo_fifa || '—' }}</strong>
-            </div>
-          </div>
-        </li>
+
+  <div class="leader-row">
+
+    <span class="pos">{{ row.position }}</span>
+
+    <span class="user">
+      {{ row.userName }}
+    </span>
+
+    <strong class="score">
+      {{ row.score }}
+    </strong>
+
+
+    <button
+      v-if="isAdmin"
+      type="button"
+      class="admin-button"
+      @click="toggleUser(row.userId)"
+    >
+      {{ isExpanded(row.userId) ? 'Ocultar' : 'Ver apuesta' }}
+    </button>
+
+
+  </div>
+
+
+  <!-- SOLO ADMIN -->
+  <div
+    v-if="isAdmin && isExpanded(row.userId)"
+    class="row-body"
+  >
+
+    <div class="team-pos">
+      <span>1º</span>
+      <strong>{{ row.pos1_codigo_fifa || '—' }}</strong>
+    </div>
+
+    <div class="team-pos">
+      <span>2º</span>
+      <strong>{{ row.pos2_codigo_fifa || '—' }}</strong>
+    </div>
+
+    <div class="team-pos">
+      <span>3º</span>
+      <strong>{{ row.pos3_codigo_fifa || '—' }}</strong>
+    </div>
+
+    <div class="team-pos">
+      <span>4º</span>
+      <strong>{{ row.pos4_codigo_fifa || '—' }}</strong>
+    </div>
+
+  </div>
+
+
+  <!-- USUARIO NORMAL SIGUE IGUAL -->
+  <div v-if="!isAdmin" class="row-body">
+
+    <div class="team-pos">
+      <span>1º</span>
+      <strong>{{ row.pos1_codigo_fifa || '—' }}</strong>
+    </div>
+
+    <div class="team-pos">
+      <span>2º</span>
+      <strong>{{ row.pos2_codigo_fifa || '—' }}</strong>
+    </div>
+
+    <div class="team-pos">
+      <span>3º</span>
+      <strong>{{ row.pos3_codigo_fifa || '—' }}</strong>
+    </div>
+
+    <div class="team-pos">
+      <span>4º</span>
+      <strong>{{ row.pos4_codigo_fifa || '—' }}</strong>
+    </div>
+
+  </div>
+
+
+</li>
       </ul>
     </div>
   </section>
@@ -182,6 +242,7 @@ export default defineComponent({
 
       errorMessage: '',
       leaderboard: [] as LeaderboardRow[],
+      expandedUsers: [] as number[],
     };
   },
   computed: {
@@ -208,7 +269,7 @@ export default defineComponent({
 
     },
     async loadTeams() {
-      const res = await fetch('/api/equipos');
+      const res = await fetch('/worldcup/api/equipos');
       const equipos = (await res.json()) as ApiEquipo[];
       this.groupTeams = equipos.filter((e) => e.grupo === 'E');
     },
@@ -216,7 +277,7 @@ export default defineComponent({
       if (!this.currentUser) return;
       const userId = this.currentUser.id;
 
-      const res = await fetch(`/api/apuestas/tipo1/grupo-ranking/me?grupo=E&usuarioId=${userId}`);
+      const res = await fetch(`/worldcup/api/apuestas/tipo1/grupo-ranking/me?grupo=E&usuarioId=${userId}`);
       if (!res.ok) return;
 
       const data = await res.json();
@@ -239,10 +300,10 @@ export default defineComponent({
       try {
         let res: Response;
         if (this.isAdmin) {
-          res = await fetch(`/api/apuestas/tipo1/grupo-ranking/leaderboard?grupo=E`);
+          res = await fetch(`/worldcup/api/apuestas/tipo1/grupo-ranking/leaderboard?grupo=E`);
         } else {
           res = await fetch(
-            `/api/apuestas/tipo1/grupo-ranking/me?grupo=E&usuarioId=${this.currentUser?.id ?? ''}`,
+            `/worldcup/api/apuestas/tipo1/grupo-ranking/me?grupo=E&usuarioId=${this.currentUser?.id ?? ''}`,
           );
         }
 
@@ -296,6 +357,18 @@ export default defineComponent({
       }
     },
 
+    toggleUser(userId: number) {
+       if (this.expandedUsers.includes(userId)) {
+        this.expandedUsers = this.expandedUsers.filter(id => id !== userId);
+       } else {
+        this.expandedUsers.push(userId);
+       }
+     },
+
+     isExpanded(userId: number): boolean {
+       return this.expandedUsers.includes(userId);
+    },
+
     validatePrediction(): string | null {
       const values = [
         this.prediction.pos1,
@@ -328,7 +401,7 @@ export default defineComponent({
       };
 
       const userId = this.currentUser.id;
-      const res = await fetch(`/api/apuestas/tipo1/grupo-ranking/me?grupo=E&usuarioId=${userId}`, {
+      const res = await fetch(`/worldcup/api/apuestas/tipo1/grupo-ranking/me?grupo=E&usuarioId=${userId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -368,7 +441,7 @@ export default defineComponent({
         pos4_codigo_fifa: 'CUW',
       };
 
-      const res = await fetch(`/api/apuestas/tipo1/grupo-ranking/define-official?usuarioId=${this.currentUser.id}`, {
+      const res = await fetch(`/worldcup/api/apuestas/tipo1/grupo-ranking/define-official?usuarioId=${this.currentUser.id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -573,6 +646,43 @@ button.submit:disabled {
   .grid {
     grid-template-columns: 1fr;
   }
+}
+
+.leader-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+
+.row-body {
+  width: 100%;
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 8px;
+}
+
+
+.team-pos {
+  background: #fff;
+  border-radius: 6px;
+  padding: 8px;
+  text-align: center;
+}
+
+
+.team-pos span {
+  display: block;
+  font-size: .75rem;
+  color: #64748b;
+}
+
+
+.team-pos strong {
+  color: #0f766e;
 }
 </style>
 

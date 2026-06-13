@@ -34,7 +34,7 @@ import type { AppUser, Prediction } from './types';
 
 const SESSION_KEY = 'sucesores-worldcup.session';
 const PREDICTIONS_KEY_PREFIX = 'sucesores-worldcup.predictions';
-const API_BASE_URL = '/api';
+const API_BASE_URL = '/worldcup/api';
 
 type AuthMode = 'login' | 'register';
 

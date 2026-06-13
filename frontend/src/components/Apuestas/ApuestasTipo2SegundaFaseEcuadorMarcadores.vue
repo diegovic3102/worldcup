@@ -204,7 +204,7 @@ export default defineComponent({
       if (!this.currentUser) return;
       const userId = this.currentUser.id;
       const res = await fetch(
-        `/api/apuestas/tipo2/ecuador-marcadores/me?usuarioId=${userId}`,
+        `/worldcup/api/apuestas/tipo2/ecuador-marcadores/me?usuarioId=${userId}`,
       );
       if (!res.ok) return;
       const data = (await res.json()) as SegundaFaseResponse;
@@ -219,7 +219,7 @@ export default defineComponent({
     async loadCompletedCount() {
       if (!this.currentUser) return;
       const res = await fetch(
-        `/api/apuestas/tipo2/ecuador-marcadores/contador?usuarioId=${this.currentUser.id}`,
+        `/worldcup/api/apuestas/tipo2/ecuador-marcadores/contador?usuarioId=${this.currentUser.id}`,
       );
       if (!res.ok) return;
       const data = await res.json();
@@ -257,7 +257,7 @@ export default defineComponent({
       }
 
 
-      const res = await fetch('/api/apuestas/tipo2/ecuador-marcadores/me', {
+      const res = await fetch('/worldcup/api/apuestas/tipo2/ecuador-marcadores/me', {
 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
