@@ -16,9 +16,9 @@
                 Definir Top 4 Oficial
             </button>
 
-            <div v-if="saved?.puntos_obtenidos !== undefined" class="points-box">
+            <div v-if="saved" class="points-box">
                 <h3>⭐ Tus puntos</h3>
-                <p>{{ saved.puntos_obtenidos }}</p>
+                <p class="points-value">{{ saved.puntos_obtenidos ?? 0 }}</p>
             </div>
         </div>
 
@@ -531,5 +531,12 @@ select {
     color: white;
     border-radius: 10px;
     font-weight: 800;
+}
+
+.points-value {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #ffffff;
+    margin: 0;
 }
 </style>

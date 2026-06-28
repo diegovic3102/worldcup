@@ -111,7 +111,7 @@ h1 {
 }
 
 .user-card strong {
-  color: #102033;
+  color: #ffffff;
   font-size: 0.94rem;
   margin-top: 4px;
   overflow-wrap: anywhere;
