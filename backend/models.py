@@ -51,7 +51,7 @@ class Equipo(db.Model):
     nombre = db.Column(db.String(100), nullable=False)
     grupo = db.Column(db.String(2))
 
-    paso_16avos = db.Column(
+    clasificado_16avos = db.Column(
         db.Boolean,
         nullable=False,
         default=False

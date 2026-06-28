@@ -575,7 +575,7 @@ def create_app(test_config=None):
 
         equipos_16avos = (
             Equipo.query
-            .filter_by(paso_16avos=True)
+            .filter_by(clasificado_16avos=True)
             .order_by(Equipo.nombre)
             .all()
         )
