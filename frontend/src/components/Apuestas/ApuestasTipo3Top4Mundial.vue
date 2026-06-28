@@ -10,6 +10,16 @@
             <button class="btn-save" @click="save" :disabled="loading">
                 {{ loading ? 'Guardando...' : 'Guardar predicción' }}
             </button>
+
+            <button v-if="currentUser.es_administrador" class="btn-save" style="background:#b91c1c; margin-left:10px"
+                @click="saveOfficial">
+                Definir Top 4 Oficial
+            </button>
+
+            <div v-if="saved?.puntos_obtenidos !== undefined" class="points-box">
+                <h3>⭐ Tus puntos</h3>
+                <p>{{ saved.puntos_obtenidos }}</p>
+            </div>
         </div>
 
         <p v-if="error" class="state-msg state-error">
@@ -184,6 +194,7 @@ export default defineComponent({
 
                 this.saved = data
                 this.locked = data.locked
+                this.saved.puntos_obtenidos = data.puntos_obtenidos
 
                 // precargar selección si ya existe
                 if (data.pos1) {
@@ -262,6 +273,42 @@ export default defineComponent({
                 this.error = 'Error de conexión con el servidor'
             } finally {
                 this.loading = false
+            }
+        },
+
+        async saveOfficial() {
+            this.error = ''
+
+            if (!this.selection.pos1 || !this.selection.pos2 || !this.selection.pos3 || !this.selection.pos4) {
+                this.error = 'Completa el Top 4 oficial'
+                return
+            }
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/apuestas/top4/mundial/define-official`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        usuario_id: this.currentUser.id,
+                        pos1: this.selection.pos1,
+                        pos2: this.selection.pos2,
+                        pos3: this.selection.pos3,
+                        pos4: this.selection.pos4
+                    })
+                })
+
+                const data = await res.json()
+
+                if (!res.ok) {
+                    this.error = data.message || 'Error definiendo oficial'
+                    return
+                }
+
+                alert('Top 4 oficial definido y puntos calculados')
+            } catch {
+                this.error = 'Error de conexión'
             }
         }
     }
@@ -469,5 +516,14 @@ select {
 
 .podium-container {
     overflow-x: auto;
+}
+
+.points-box {
+    margin-top: 12px;
+    padding: 12px;
+    background: #0f766e;
+    color: white;
+    border-radius: 10px;
+    font-weight: 800;
 }
 </style>

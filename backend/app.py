@@ -239,7 +239,7 @@ def create_app(test_config=None):
         total = 0.0
 
         for k, w in weights.items():
-            if pred.get(k) == official.get(k):
+            if pred.get(f"{k}_codigo_fifa") == official.get(f"{k}_codigo_fifa"):
                 total += w
 
         return total
@@ -665,7 +665,8 @@ def create_app(test_config=None):
             "pos2": pred.pos2_codigo_fifa,
             "pos3": pred.pos3_codigo_fifa,
             "pos4": pred.pos4_codigo_fifa,
-            "locked": bool(pred.pos1_codigo_fifa)
+            "locked": bool(pred.pos1_codigo_fifa),
+            "puntos_obtenidos": pred.puntos_obtenidos
         })
         
     @app.post("/api/apuestas/top4/mundial/define-official")
@@ -715,10 +716,10 @@ def create_app(test_config=None):
 
         for p in preds:
             pred_dict = {
-                "pos1": p.pos1_codigo_fifa,
-                "pos2": p.pos2_codigo_fifa,
-                "pos3": p.pos3_codigo_fifa,
-                "pos4": p.pos4_codigo_fifa,
+                "pos1_codigo_fifa": p.pos1_codigo_fifa,
+                "pos2_codigo_fifa": p.pos2_codigo_fifa,
+                "pos3_codigo_fifa": p.pos3_codigo_fifa,
+                "pos4_codigo_fifa": p.pos4_codigo_fifa,
             }
 
             p.puntos_obtenidos = points_for_top4(pred_dict, official_dict)
