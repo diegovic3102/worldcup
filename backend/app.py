@@ -593,31 +593,64 @@ def create_app(test_config=None):
     @app.post("/api/apuestas/top4/mundial/me")
     def top4_save():
 
-        payload=request.get_json()
+        payload = request.get_json() or {}
+        user_id = payload.get("usuario_id")
 
-        user_id=payload.get("usuario_id")
+        if not user_id:
+            return jsonify({"message": "Usuario requerido"}), 400
 
-        pred = PrediccionTop4Mundial.query.filter_by(
-            usuario_id=user_id
-        ).first()
+        pred = PrediccionTop4Mundial.query.filter_by(usuario_id=user_id).first()
 
+        # 🚫 BLOQUEO TOTAL
+        if pred and pred.pos1_codigo_fifa:
+            return jsonify({
+                "message": "Ya registraste tu Top 4 y no puede modificarse."
+            }), 403
 
         if not pred:
-            pred=PrediccionTop4Mundial(
-                usuario_id=user_id
-            )
+            pred = PrediccionTop4Mundial(usuario_id=user_id)
             db.session.add(pred)
-
 
         pred.pos1_codigo_fifa = payload.get("pos1")
         pred.pos2_codigo_fifa = payload.get("pos2")
         pred.pos3_codigo_fifa = payload.get("pos3")
         pred.pos4_codigo_fifa = payload.get("pos4")
 
-
         db.session.commit()
 
-        return jsonify({"ok":True})
+        return jsonify({"ok": True})
+
+    @app.get("/api/apuestas/top4/mundial/me")
+    def top4_me():
+
+        user_id = request.args.get("usuarioId")
+
+        if not user_id:
+            return jsonify({"message": "usuarioId requerido"}), 400
+
+        try:
+            user_id = int(user_id)
+        except:
+            return jsonify({"message": "usuarioId inválido"}), 400
+
+        pred = PrediccionTop4Mundial.query.filter_by(usuario_id=user_id).first()
+
+        if not pred:
+            return jsonify({
+                "pos1": None,
+                "pos2": None,
+                "pos3": None,
+                "pos4": None,
+                "locked": False
+            })
+
+        return jsonify({
+            "pos1": pred.pos1_codigo_fifa,
+            "pos2": pred.pos2_codigo_fifa,
+            "pos3": pred.pos3_codigo_fifa,
+            "pos4": pred.pos4_codigo_fifa,
+            "locked": bool(pred.pos1_codigo_fifa)
+        })
 
     return app
 
