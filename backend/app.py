@@ -238,9 +238,12 @@ def create_app(test_config=None):
 
         total = 0.0
 
-        for k, w in weights.items():
-            if pred.get(f"{k}_codigo_fifa") == official.get(f"{k}_codigo_fifa"):
-                total += w
+        for pos, weight in weights.items():
+            pred_code = pred.get(f"{pos}_codigo_fifa")
+            official_code = official.get(f"{pos}_codigo_fifa")
+
+            if pred_code and official_code and pred_code == official_code:
+                total += weight
 
         return total
 
@@ -708,10 +711,10 @@ def create_app(test_config=None):
         preds = PrediccionTop4Mundial.query.all()
 
         official_dict = {
-            "pos1": oficial.pos1_codigo_fifa,
-            "pos2": oficial.pos2_codigo_fifa,
-            "pos3": oficial.pos3_codigo_fifa,
-            "pos4": oficial.pos4_codigo_fifa,
+            "pos1_codigo_fifa": oficial.pos1_codigo_fifa,
+            "pos2_codigo_fifa": oficial.pos2_codigo_fifa,
+            "pos3_codigo_fifa": oficial.pos3_codigo_fifa,
+            "pos4_codigo_fifa": oficial.pos4_codigo_fifa,
         }
 
         for p in preds:
