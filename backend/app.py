@@ -227,6 +227,22 @@ def create_app(test_config=None):
             if pred_code and official_code and pred_code == official_code:
                 total += weight
         return total
+    
+    def points_for_top4(pred, official):
+        weights = {
+            "pos1": 1.0,
+            "pos2": 0.75,
+            "pos3": 0.50,
+            "pos4": 0.25
+        }
+
+        total = 0.0
+
+        for k, w in weights.items():
+            if pred.get(k) == official.get(k):
+                total += w
+
+        return total
 
     @app.post("/api/apuestas/tipo1/grupo-ranking/me")
     def tipo1_me_save():
@@ -651,6 +667,66 @@ def create_app(test_config=None):
             "pos4": pred.pos4_codigo_fifa,
             "locked": bool(pred.pos1_codigo_fifa)
         })
+        
+    @app.post("/api/apuestas/top4/mundial/define-official")
+    def top4_define_official():
+
+        payload = request.get_json(silent=True) or {}
+
+        user_id = payload.get("usuario_id")
+        if not user_id:
+            return jsonify({"message": "No autorizado"}), 403
+
+        user = Usuario.query.filter_by(id=user_id).first()
+
+        if not user or not is_admin(user):
+            return jsonify({"message": "No autorizado"}), 403
+
+        pos1 = payload.get("pos1")
+        pos2 = payload.get("pos2")
+        pos3 = payload.get("pos3")
+        pos4 = payload.get("pos4")
+
+        if not pos1 or not pos2 or not pos3 or not pos4:
+            return jsonify({"message": "Completar Top 4 oficial"}), 400
+
+        oficial = Top4ResultadoOficial.query.first()
+
+        if not oficial:
+            oficial = Top4ResultadoOficial()
+            db.session.add(oficial)
+
+        oficial.pos1_codigo_fifa = pos1
+        oficial.pos2_codigo_fifa = pos2
+        oficial.pos3_codigo_fifa = pos3
+        oficial.pos4_codigo_fifa = pos4
+
+        db.session.commit()
+
+        # 🔥 CALCULAR PUNTOS (IMPORTANTE)
+        preds = PrediccionTop4Mundial.query.all()
+
+        official_dict = {
+            "pos1": oficial.pos1_codigo_fifa,
+            "pos2": oficial.pos2_codigo_fifa,
+            "pos3": oficial.pos3_codigo_fifa,
+            "pos4": oficial.pos4_codigo_fifa,
+        }
+
+        for p in preds:
+            pred_dict = {
+                "pos1": p.pos1_codigo_fifa,
+                "pos2": p.pos2_codigo_fifa,
+                "pos3": p.pos3_codigo_fifa,
+                "pos4": p.pos4_codigo_fifa,
+            }
+
+            p.puntos_obtenidos = points_for_top4(pred_dict, official_dict)
+
+        db.session.commit()
+
+        return jsonify({"ok": True}) 
+
 
     return app
 

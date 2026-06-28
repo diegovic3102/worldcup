@@ -9,10 +9,6 @@
         <small>Usuario</small>
         <strong>{{ userName }}</strong>
       </div>
-      <div class="summary-pill">
-        <span>{{ savedCount }}</span>
-        <small>{{ savedLabel }}</small>
-      </div>
       <button type="button" @click="$emit('logout')">Salir</button>
     </div>
   </header>
@@ -88,22 +84,23 @@ h1 {
   padding: 16px;
 }
 
-.header-actions {
-  align-items: stretch;
-  display: flex;
-  flex-shrink: 0;
-  gap: 10px;
-}
-
 .user-card {
-  background: #fff;
+  background: #102033;
   border: 1px solid #d9e2ec;
   border-radius: 8px;
+  color: #fff;
   display: flex;
   flex-direction: column;
   justify-content: center;
   min-width: 150px;
   padding: 12px 14px;
+}
+
+.header-actions {
+  align-items: stretch;
+  display: flex;
+  flex-shrink: 0;
+  gap: 10px;
 }
 
 .user-card small {
