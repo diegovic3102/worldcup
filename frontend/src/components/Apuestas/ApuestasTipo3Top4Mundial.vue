@@ -155,6 +155,10 @@ export default defineComponent({
     mounted() {
         this.fetchEquipos()
         this.fetchSaved()
+
+        setInterval(() => {
+            this.fetchSaved()
+        }, 15000) // cada 15s
     },
 
     methods: {
@@ -307,6 +311,8 @@ export default defineComponent({
                 }
 
                 alert('Top 4 oficial definido y puntos calculados')
+
+                await this.fetchSaved()
             } catch {
                 this.error = 'Error de conexión'
             }
