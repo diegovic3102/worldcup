@@ -1,12 +1,8 @@
 <template>
   <main class="auth-page">
     <section class="auth-copy">
-      <p class="eyebrow">Polla mundialista</p>
+      <p class="eyebrow">Polla Mundialista - Sucesores</p>
       <h1>{{ title }}</h1>
-      <p>
-        Entra con tu usuario de trabajo para guardar tus marcadores y separar tus apuestas
-        de las del resto del equipo.
-      </p>
     </section>
 
     <section class="auth-panel" aria-label="Acceso de usuario">
@@ -30,21 +26,21 @@
       <form @submit.prevent="submit">
         <label v-if="mode === 'register'">
           Nombres
-          <input v-model.trim="nombres" autocomplete="given-name" placeholder="Tus nombres" type="text" />
+          <input v-model.trim="nombres" autocomplete="given-name" type="text" />
         </label>
 
         <label v-if="mode === 'register'">
           Apellidos
-          <input v-model.trim="apellidos" autocomplete="family-name" placeholder="Tus apellidos" type="text" />
+          <input v-model.trim="apellidos" autocomplete="family-name" type="text" />
         </label>
 
         <label>
           Usuario
-          <input v-model.trim="usuario" autocomplete="username" placeholder="tu.usuario" type="text" />
+          <input v-model.trim="usuario" autocomplete="username" type="text" />
         </label>
 
         <label>
-          Contrasena
+          Contraseña
           <input
             v-model="password"
             autocomplete="current-password"

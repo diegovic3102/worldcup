@@ -289,6 +289,13 @@ export default defineComponent({
       this.prediction.pos3 = data?.pos3_codigo_fifa ?? '';
       this.prediction.pos4 = data?.pos4_codigo_fifa ?? '';
 
+
+      this.hasSavedPrediction =
+      !!data?.pos1_codigo_fifa &&
+      !!data?.pos2_codigo_fifa &&
+      !!data?.pos3_codigo_fifa &&
+      !!data?.pos4_codigo_fifa;
+
       if (data && data.puntos_obtenidos !== null && data.puntos_obtenidos !== undefined) {
         this.myScore = String(data.puntos_obtenidos);
       }
@@ -425,37 +432,39 @@ export default defineComponent({
       await this.loadMyPredictionIfAny();
       await this.loadLeaderboard();
 
+      this.hasSavedPrediction = true;
     },
-    async defineOfficialResult() {
-      // Para no bloquearte con UI de selección oficial todavía:
-      // admin pone un ejemplo editable; cuando conectemos tablas reales lo hacemos bien.
-      if (!this.currentUser?.es_administrador) return;
+   
 
-      const payload: DefineOfficialResultPayload = {
-        grupo: 'E',
-        // Debe coincidir EXACTAMENTE con los códigos FIFA usados en las apuestas:
-        // GER, CIV, ECU, CUW
-        pos1_codigo_fifa: 'GER',
-        pos2_codigo_fifa: 'CIV',
-        pos3_codigo_fifa: 'ECU',
-        pos4_codigo_fifa: 'CUW',
-      };
+async defineOfficialResult() {
+  if (!this.currentUser?.es_administrador) return;
 
-      const res = await fetch(`/worldcup/api/apuestas/tipo1/grupo-ranking/define-official?usuarioId=${this.currentUser.id}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
+  const payload = {
+    grupo: 'E',
+    pos1_codigo_fifa: this.prediction.pos1,
+    pos2_codigo_fifa: this.prediction.pos2,
+    pos3_codigo_fifa: this.prediction.pos3,
+    pos4_codigo_fifa: this.prediction.pos4,
+  };
 
+  const res = await fetch(
+    `/worldcup/api/apuestas/tipo1/grupo-ranking/define-official?usuarioId=${this.currentUser.id}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }
+  );
 
-      const data = await res.json();
-      if (!res.ok) {
-        window.alert(data?.message || 'No se pudo definir resultados');
-        return;
-      }
+  const data = await res.json();
 
-      await this.loadLeaderboard();
-    },
+  if (!res.ok) {
+    window.alert(data?.message || 'No se pudo definir resultados');
+    return;
+  }
+
+  await this.loadLeaderboard();}
+
   },
 });
 </script>

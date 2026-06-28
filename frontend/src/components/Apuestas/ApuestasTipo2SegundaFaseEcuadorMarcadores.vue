@@ -59,6 +59,7 @@
             />
           </label>
           <label>
+            <img class="team-flag" :src="gerImg" alt="GER" />
             Alemania
             <input
               class="score-input"
@@ -76,7 +77,7 @@
         <h4 class="match-title">Ecuador vs Costa de Marfíl</h4>
         <div class="score-grid">
           <label>
-            Ecuador
+            <img class="team-flag" :src="ecuImg" alt="ECU" />
             <input
               class="score-input"
               type="number"
@@ -87,7 +88,7 @@
             />
           </label>
           <label>
-            Costa de Marfíl
+            <img class="team-flag" :src="civImg" alt="CIV" />
             <input
               class="score-input"
               type="number"
@@ -120,6 +121,8 @@ import type { AppUser } from '../../types';
 
 import ecuImg from '../../assets/ECU.png';
 import cuwImg from '../../assets/CUW.png';
+import gerImg from '../../assets/GER.png';
+import civImg from '../../assets/CIV.png';
 
 // Aseguramos que el scope del componente tenga las propiedades usadas en el template
 
@@ -161,6 +164,8 @@ export default defineComponent({
 
       ecuImg,
       cuwImg,
+      gerImg,
+      civImg,
       form: {
         ecu_cur_local_goles: null as number | null,
         ecu_cur_visitante_goles: null as number | null,
