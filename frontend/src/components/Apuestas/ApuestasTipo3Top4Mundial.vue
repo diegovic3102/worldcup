@@ -255,6 +255,9 @@ export default defineComponent({
                 }
 
                 alert('Predicción guardada correctamente')
+
+                // 🔥 ACTUALIZAR INMEDIATAMENTE ESTADO
+                await this.fetchSaved()
             } catch {
                 this.error = 'Error de conexión con el servidor'
             } finally {
@@ -352,76 +355,100 @@ select:focus {
 
 
 .podium-container {
-  margin-top: 24px;
-  padding: 20px;
-  background: #0f172a;
-  border-radius: 14px;
-  color: white;
-  text-align: center;
-  overflow: hidden;
+    margin-top: 24px;
+    padding: 20px;
+    background: #0f172a;
+    border-radius: 14px;
+    color: white;
+    text-align: center;
+    overflow: hidden;
 }
 
 .podium {
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  gap: 12px;
-  margin-top: 20px;
-  height: 180px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+    height: 180px;
 }
 
 .podium-item {
-  width: 90px;
-  background: #1e293b;
-  border-radius: 10px;
-  padding: 10px;
-  animation: popIn 0.6s ease forwards;
-  opacity: 0;
-  transform: translateY(30px);
+    width: 90px;
+    background: #1e293b;
+    border-radius: 10px;
+    padding: 10px;
+    animation: popIn 0.6s ease forwards;
+    opacity: 0;
+    transform: translateY(30px);
 }
 
 .podium-item .position {
-  font-size: 1.2rem;
-  font-weight: 900;
-  margin-bottom: 6px;
+    font-size: 1.2rem;
+    font-weight: 900;
+    margin-bottom: 6px;
 }
 
 .podium-item .team {
-  font-size: 0.75rem;
-  font-weight: 700;
+    font-size: 0.75rem;
+    font-weight: 700;
 }
 
 .first {
-  height: 140px;
-  background: gold;
-  color: #1a1a1a;
-  animation-delay: 0.1s;
+    height: 140px;
+    background: gold;
+    color: #1a1a1a;
+    animation-delay: 0.1s;
 }
 
 .second {
-  height: 110px;
-  background: silver;
-  color: #1a1a1a;
-  animation-delay: 0.2s;
+    height: 110px;
+    background: silver;
+    color: #1a1a1a;
+    animation-delay: 0.2s;
 }
 
 .third {
-  height: 90px;
-  background: #cd7f32;
-  color: #1a1a1a;
-  animation-delay: 0.3s;
+    height: 90px;
+    background: #cd7f32;
+    color: #1a1a1a;
+    animation-delay: 0.3s;
 }
 
 .fourth {
-  height: 80px;
-  background: #334155;
-  animation-delay: 0.4s;
+    height: 80px;
+    background: #334155;
+    animation-delay: 0.4s;
 }
 
 @keyframes popIn {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+select {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+    .podium {
+        flex-direction: column;
+        align-items: center;
+        height: auto;
+    }
+
+    .podium-item {
+        width: 70%;
+        max-width: 220px;
+    }
 }
 </style>
