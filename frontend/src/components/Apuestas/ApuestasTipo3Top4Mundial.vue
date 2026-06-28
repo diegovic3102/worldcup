@@ -441,14 +441,33 @@ select {
 
 @media (max-width: 768px) {
     .podium {
-        flex-direction: column;
-        align-items: center;
-        height: auto;
+        gap: 6px;
+        transform: scale(0.9);
     }
 
     .podium-item {
-        width: 70%;
-        max-width: 220px;
+        width: 70px;
+        min-width: 70px;
     }
+
+    .first {
+        height: 120px;
+    }
+
+    .second {
+        height: 95px;
+    }
+
+    .third {
+        height: 80px;
+    }
+
+    .fourth {
+        height: 70px;
+    }
+}
+
+.podium-container {
+    overflow-x: auto;
 }
 </style>
