@@ -3,18 +3,10 @@
     <AuthPanel v-if="!currentUser" @submit-auth="handleAuth" />
 
     <template v-else>
-      <AppHeader
-        :saved-count="savedCount"
-        :user-name="userDisplayName"
-        @logout="logout"
-      />
+      <AppHeader :saved-count="savedCount" :user-name="userDisplayName" @logout="logout" />
 
-      <section class="type1-apuestas" aria-label="Apuestas Tipo 1" v-if="currentUser">
-        <ApuestasTipo1GrupoRanking :current-user="currentUser" />
-      </section>
-
-      <section class="type2-apuestas" aria-label="Apuestas Tipo 2" v-if="currentUser">
-        <ApuestasTipo2SegundaFaseEcuadorMarcadores :current-user="currentUser" />
+      <section class="type3-apuestas" v-if="currentUser">
+        <ApuestasTipo3Top4Mundial :current-user="currentUser" />
       </section>
 
     </template>
@@ -25,8 +17,7 @@
 import { defineComponent } from 'vue';
 import AppHeader from './components/AppHeader.vue';
 import AuthPanel from './components/AuthPanel.vue';
-import ApuestasTipo1GrupoRanking from './components/Apuestas/ApuestasTipo1GrupoRanking.vue';
-import ApuestasTipo2SegundaFaseEcuadorMarcadores from './components/Apuestas/ApuestasTipo2SegundaFaseEcuadorMarcadores.vue';
+import ApuestasTipo3Top4Mundial from './components/Apuestas/ApuestasTipo3Top4Mundial.vue';
 import type { AppUser, Prediction } from './types';
 
 
@@ -56,8 +47,7 @@ export default defineComponent({
   components: {
     AppHeader,
     AuthPanel,
-    ApuestasTipo1GrupoRanking,
-    ApuestasTipo2SegundaFaseEcuadorMarcadores,
+    ApuestasTipo3Top4Mundial,
   },
 
 
@@ -69,7 +59,7 @@ export default defineComponent({
       loadingMatches: false,
       matchesError: '',
       currentUser: null as AppUser | null,
-    predictions: {} as Record<string, Prediction>,
+      predictions: {} as Record<string, Prediction>,
 
     };
   },
@@ -200,10 +190,10 @@ export default defineComponent({
       };
       window.localStorage.setItem(SESSION_KEY, JSON.stringify(this.currentUser));
       this.loadPredictions();
-    
+
       // Dentro de este proyecto, la UI de Apuestas carga los partidos/teams
       // desde sus propios endpoints. Evitamos llamar a funciones no existentes.
-    
+
     },
   },
 });

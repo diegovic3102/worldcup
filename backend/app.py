@@ -542,6 +542,7 @@ def create_app(test_config=None):
             }
         ), 200
 
+
     @app.get("/api/apuestas/tipo2/ecuador-marcadores/contador")
     def tipo2_ecuador_marcadores_contador():
         # Admin: contar usuarios que tengan los 3 partidos completos (6 valores no NULL)
@@ -569,6 +570,54 @@ def create_app(test_config=None):
 
         return jsonify({"completed_count": int(count_completed or 0)}), 200
 
+    @app.get("/api/apuestas/top4/equipos")
+    def top4_equipos():
+
+        equipos_16avos = (
+            Equipo.query
+            .filter_by(paso_16avos=True)
+            .order_by(Equipo.nombre)
+            .all()
+        )
+
+        return jsonify([
+            {
+                "codigo_fifa": e.codigo_fifa,
+                "nombre": e.nombre,
+                "grupo": e.grupo
+            }
+            for e in equipos_16avos
+        ])
+
+
+    @app.post("/api/apuestas/top4/mundial/me")
+    def top4_save():
+
+        payload=request.get_json()
+
+        user_id=payload.get("usuario_id")
+
+        pred = PrediccionTop4Mundial.query.filter_by(
+            usuario_id=user_id
+        ).first()
+
+
+        if not pred:
+            pred=PrediccionTop4Mundial(
+                usuario_id=user_id
+            )
+            db.session.add(pred)
+
+
+        pred.pos1_codigo_fifa = payload.get("pos1")
+        pred.pos2_codigo_fifa = payload.get("pos2")
+        pred.pos3_codigo_fifa = payload.get("pos3")
+        pred.pos4_codigo_fifa = payload.get("pos4")
+
+
+        db.session.commit()
+
+        return jsonify({"ok":True})
 
     return app
 
