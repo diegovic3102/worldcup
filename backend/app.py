@@ -857,16 +857,35 @@ def create_app(test_config=None):
         partido_id = request.args.get("partidoId")
 
 
+        if not usuario_id or not partido_id:
+            return jsonify({
+                "message": "usuarioId y partidoId requeridos"
+            }),400
+
+
+        try:
+            usuario_id = int(usuario_id)
+            partido_id = int(partido_id)
+        
+        except Exception:
+            return jsonify({
+                "message": "IDs inválidos"
+            }),400
+
+
+
         pred = PrediccionEcuadorMarcador.query.filter_by(
             usuario_id=usuario_id,
             partido_id=partido_id
         ).first()
 
 
+
         if not pred:
             return jsonify({
                 "guardado":False
-            })
+            }),200
+
 
 
         return jsonify({
@@ -875,7 +894,7 @@ def create_app(test_config=None):
             "goles_local":pred.goles_local,
             "goles_visitante":pred.goles_visitante
 
-        })
+        }),200
 
 
     return app

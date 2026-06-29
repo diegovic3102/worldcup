@@ -49,14 +49,14 @@
             </div>
 
 
-            <button v-if="!locked && marcador.local === null" class="btn-save" @click="guardar">
+            <button v-if="!locked" class="btn-save" @click="guardar">
 
                 Guardar marcador
 
             </button>
 
 
-            <p v-else class="locked-msg">
+            <p v-if="locked" class="locked-msg">
                 ✅ Marcador registrado y bloqueado
             </p>
 
@@ -155,6 +155,11 @@ export default defineComponent({
 
             this.partido = data
 
+            if (!data.id) {
+                this.loaded = true
+                return
+            }
+
 
             if (!this.currentUser?.id || !data.id) {
                 return
@@ -172,7 +177,7 @@ export default defineComponent({
             console.log("Mi predicción:", predData)
 
 
-            if (predData.guardado === true) {
+            if (predData.guardado) {
 
                 this.marcador.local = predData.goles_local
                 this.marcador.visitante = predData.goles_visitante
@@ -180,6 +185,13 @@ export default defineComponent({
                 this.locked = true
 
             }
+            else {
+
+                this.locked = false
+
+            }
+
+
 
 
             this.loaded = true
@@ -230,7 +242,6 @@ export default defineComponent({
 
 
             this.locked = true
-
 
             alert('Marcador guardado')
 
