@@ -41,6 +41,11 @@ class Usuario(db.Model):
         back_populates="usuario",
         cascade="all, delete-orphan",
     )
+    
+    predicciones_ecuador = db.relationship(
+        "PrediccionEcuadorMarcador",
+        cascade="all, delete-orphan"
+    )
 
 
 class Equipo(db.Model):
@@ -258,3 +263,72 @@ class Apuesta(db.Model):
     partido = db.relationship("Partido", back_populates="apuestas")
 
 
+class PrediccionEcuadorFase(db.Model):
+    __tablename__ = "prediccion_ecuador_fases"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    fase = db.Column(db.String(20), unique=True)
+
+    equipo_local_id = db.Column(
+        db.Integer,
+        db.ForeignKey("equipos.id")
+    )
+
+    equipo_visitante_id = db.Column(
+        db.Integer,
+        db.ForeignKey("equipos.id")
+    )
+
+    activo = db.Column(db.Boolean, default=False)
+
+    goles_local = db.Column(db.Integer)
+    goles_visitante = db.Column(db.Integer)
+
+    equipo_local = db.relationship(
+        "Equipo",
+        foreign_keys=[equipo_local_id]
+    )
+
+    equipo_visitante = db.relationship(
+        "Equipo",
+        foreign_keys=[equipo_visitante_id]
+    )
+
+
+
+class PrediccionEcuadorMarcador(db.Model):
+    __tablename__="prediccion_ecuador_marcador"
+
+    __table_args__ = (
+        db.UniqueConstraint(
+            "usuario_id",
+            "partido_id",
+            name="uq_ecuador_usuario_partido"
+        ),
+    )
+    id=db.Column(db.Integer,primary_key=True)
+
+    usuario_id=db.Column(
+        db.Integer,
+        db.ForeignKey("usuarios.id"),
+        nullable=False
+    )
+
+    partido_id=db.Column(
+        db.Integer,
+        db.ForeignKey("prediccion_ecuador_fases.id"),
+        nullable=False
+    )
+
+    goles_local=db.Column(db.Integer)
+
+    goles_visitante=db.Column(db.Integer)
+
+    fecha_guardado=db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
+
+    usuario = db.relationship("Usuario")
+    partido = db.relationship("PrediccionEcuadorFase")

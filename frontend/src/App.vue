@@ -8,6 +8,9 @@
       <section class="type3-apuestas" v-if="currentUser">
         <ApuestasTipo3Top4Mundial :current-user="currentUser" />
       </section>
+      <section class="type3-apuestas">
+        <ApuestasEcuadorFases :current-user="currentUser" />
+      </section>
 
     </template>
   </div>
@@ -18,6 +21,7 @@ import { defineComponent } from 'vue';
 import AppHeader from './components/AppHeader.vue';
 import AuthPanel from './components/AuthPanel.vue';
 import ApuestasTipo3Top4Mundial from './components/Apuestas/ApuestasTipo3Top4Mundial.vue';
+import ApuestasEcuadorFases from './components/Apuestas/ApuestasEcuadorFases.vue';
 import type { AppUser, Prediction } from './types';
 
 
@@ -48,6 +52,7 @@ export default defineComponent({
     AppHeader,
     AuthPanel,
     ApuestasTipo3Top4Mundial,
+    ApuestasEcuadorFases,
   },
 
 

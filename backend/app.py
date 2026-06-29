@@ -17,6 +17,8 @@ from models import (
     PrediccionSegundaFaseEcuadorMarcadores,
     PrediccionTop4Mundial,
     Top4ResultadoOficial,
+    PrediccionEcuadorFase,
+    PrediccionEcuadorMarcador,
     Usuario,
 )
 
@@ -730,6 +732,121 @@ def create_app(test_config=None):
         db.session.commit()
 
         return jsonify({"ok": True}) 
+
+
+    @app.get("/api/apuestas/ecuador-fase")
+    def ecuador_fase():
+
+        partido = (
+            PrediccionEcuadorFase.query
+            .filter_by(activo=True)
+            .first()
+        )
+
+        if not partido:
+            return jsonify({
+                "activo":False
+            })
+
+        return jsonify({
+            "activo":True,
+            "id":partido.id,
+            "fase":partido.fase,
+
+            "local":{
+                "codigo":partido.equipo_local.codigo_fifa,
+                "nombre":partido.equipo_local.nombre
+            },
+
+            "visitante":{
+                "codigo":partido.equipo_visitante.codigo_fifa,
+                "nombre":partido.equipo_visitante.nombre
+            }
+        })
+    
+
+    @app.post("/api/admin/ecuador-fase/activar")
+    def activar_partido():
+
+        data=request.json
+
+
+        partido=PrediccionEcuadorFase.query.filter_by(
+            fase=data["fase"]
+        ).first()
+
+
+        local=Equipo.query.filter_by(
+            codigo_fifa=data["local"]
+        ).first()
+
+        visitante=Equipo.query.filter_by(
+            codigo_fifa=data["visitante"]
+        ).first()
+
+
+        PrediccionEcuadorFase.query.update({
+            "activo":False
+        })
+
+
+        partido.equipo_local_id=local.id
+        partido.equipo_visitante_id=visitante.id
+        partido.activo=True
+
+
+        db.session.commit()
+
+
+        return jsonify({"ok":True})
+
+    @app.post("/api/apuestas/ecuador-fase")
+    def guardar_ecuador_fase():
+
+        data = request.json
+
+        usuario_id = data.get("usuario_id")
+        partido_id = data.get("partido_id")
+        goles_local = data.get("goles_local")
+        goles_visitante = data.get("goles_visitante")
+
+
+        if usuario_id is None or partido_id is None:
+            return jsonify({
+                "message": "Datos incompletos"
+            }), 400
+
+
+        prediccion = PrediccionEcuadorMarcador.query.filter_by(
+            usuario_id=usuario_id,
+            partido_id=partido_id
+        ).first()
+
+
+        if prediccion:
+
+            prediccion.goles_local = goles_local
+            prediccion.goles_visitante = goles_visitante
+
+        else:
+
+            prediccion = PrediccionEcuadorMarcador(
+                usuario_id=usuario_id,
+                partido_id=partido_id,
+                goles_local=goles_local,
+                goles_visitante=goles_visitante
+            )
+
+            db.session.add(prediccion)
+
+
+        db.session.commit()
+
+
+    return jsonify({
+        "ok": True,
+        "message": "Marcador guardado"
+    })
 
 
     return app
