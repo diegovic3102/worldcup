@@ -1,6 +1,6 @@
 <template>
 
-    <div class="ecuador-box">
+    <div class="ecuador-box" v-if="loaded">
 
         <div v-if="!partido.activo">
             <h3>🇪🇨 Fases finales Ecuador</h3>
@@ -104,7 +104,9 @@ export default defineComponent({
                 visitante: null
             },
 
-            locked: false
+            locked: false,
+
+            loaded: false
 
         }
 
@@ -172,15 +174,15 @@ export default defineComponent({
 
             if (predData.guardado === true) {
 
-
                 this.marcador.local = predData.goles_local
-
                 this.marcador.visitante = predData.goles_visitante
-
 
                 this.locked = true
 
             }
+
+
+            this.loaded = true
 
         },
 
