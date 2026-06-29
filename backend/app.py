@@ -814,7 +814,7 @@ def create_app(test_config=None):
         if usuario_id is None or partido_id is None:
             return jsonify({
                 "message": "Datos incompletos"
-            }), 400
+            }),400
 
 
         prediccion = PrediccionEcuadorMarcador.query.filter_by(
@@ -823,29 +823,58 @@ def create_app(test_config=None):
         ).first()
 
 
+        # 🔒 BLOQUEO DEFINITIVO
         if prediccion:
+            return jsonify({
+                "message": "Ya registraste tu marcador y no puede modificarse."
+            }),403
 
-            prediccion.goles_local = goles_local
-            prediccion.goles_visitante = goles_visitante
 
-        else:
 
-            prediccion = PrediccionEcuadorMarcador(
-                usuario_id=usuario_id,
-                partido_id=partido_id,
-                goles_local=goles_local,
-                goles_visitante=goles_visitante
-            )
+        prediccion = PrediccionEcuadorMarcador(
+            usuario_id=usuario_id,
+            partido_id=partido_id,
+            goles_local=goles_local,
+            goles_visitante=goles_visitante
+        )
 
-            db.session.add(prediccion)
 
+        db.session.add(prediccion)
 
         db.session.commit()
 
 
         return jsonify({
-            "ok": True,
-            "message": "Marcador guardado"
+            "ok":True,
+            "message":"Marcador guardado"
+        })
+        
+
+    @app.get("/api/apuestas/ecuador-fase/me")
+    def ecuador_fase_me():
+
+        usuario_id = request.args.get("usuarioId")
+        partido_id = request.args.get("partidoId")
+
+
+        pred = PrediccionEcuadorMarcador.query.filter_by(
+            usuario_id=usuario_id,
+            partido_id=partido_id
+        ).first()
+
+
+        if not pred:
+            return jsonify({
+                "guardado":False
+            })
+
+
+        return jsonify({
+
+            "guardado":True,
+            "goles_local":pred.goles_local,
+            "goles_visitante":pred.goles_visitante
+
         })
 
 
