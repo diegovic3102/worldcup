@@ -843,10 +843,10 @@ def create_app(test_config=None):
         db.session.commit()
 
 
-    return jsonify({
-        "ok": True,
-        "message": "Marcador guardado"
-    })
+        return jsonify({
+            "ok": True,
+            "message": "Marcador guardado"
+        })
 
 
     return app
