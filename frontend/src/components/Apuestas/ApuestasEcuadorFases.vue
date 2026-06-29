@@ -49,7 +49,7 @@
             </div>
 
 
-            <button v-if="!locked" class="btn-save" @click="guardar">
+            <button v-if="!locked && marcador.local === null" class="btn-save" @click="guardar">
 
                 Guardar marcador
 
@@ -114,7 +114,7 @@ export default defineComponent({
 
     mounted() {
 
-        this.cargar()
+        this.esperarUsuario()
 
     },
 
@@ -122,39 +122,63 @@ export default defineComponent({
 
     methods: {
 
+        async esperarUsuario() {
+
+            let intentos = 0
+
+            while (!this.currentUser?.id && intentos < 20) {
+
+                await new Promise(resolve => setTimeout(resolve, 300))
+
+                intentos++
+
+            }
+
+
+            this.cargar()
+
+        },
+
 
         async cargar() {
+
 
             const res = await fetch(
                 `${API_BASE_URL}/apuestas/ecuador-fase`
             )
 
+
             const data = await res.json()
+
 
             this.partido = data
 
 
-            if (this.currentUser && data.id) {
-
-                const pred = await fetch(
-                    `${API_BASE_URL}/apuestas/ecuador-fase/me?usuarioId=${this.currentUser.id}&partidoId=${data.id}`
-                )
+            if (!this.currentUser?.id || !data.id) {
+                return
+            }
 
 
-                const predData = await pred.json()
+            const pred = await fetch(
+                `${API_BASE_URL}/apuestas/ecuador-fase/me?usuarioId=${this.currentUser.id}&partidoId=${data.id}`
+            )
 
 
-                console.log("Mi predicción:", predData)
+            const predData = await pred.json()
 
 
-                if (predData.guardado === true) {
+            console.log("Mi predicción:", predData)
 
-                    this.marcador.local = predData.goles_local
-                    this.marcador.visitante = predData.goles_visitante
 
-                    this.locked = true
+            if (predData.guardado === true) {
 
-                }
+
+                this.marcador.local = predData.goles_local
+
+                this.marcador.visitante = predData.goles_visitante
+
+
+                this.locked = true
 
             }
 
