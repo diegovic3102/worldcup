@@ -27,7 +27,7 @@
                         {{ partido.local.nombre }}
                     </strong>
 
-                    <input type="number" v-model="marcador.local" min="0" :disabled="locked" />
+                    <input type="number" v-model="marcador.local" min="0" :readonly="locked" />
                 </div>
 
 
@@ -42,7 +42,7 @@
                         {{ partido.visitante.nombre }}
                     </strong>
 
-                    <input type="number" v-model="marcador.visitante" min="0" :disabled="locked" />
+                    <input type="number" v-model="marcador.visitante" min="0" :readonly="locked" />
 
                 </div>
 
@@ -131,7 +131,6 @@ export default defineComponent({
 
             const data = await res.json()
 
-
             this.partido = data
 
 
@@ -145,7 +144,10 @@ export default defineComponent({
                 const predData = await pred.json()
 
 
-                if (predData.guardado) {
+                console.log("Mi predicción:", predData)
+
+
+                if (predData.guardado === true) {
 
                     this.marcador.local = predData.goles_local
                     this.marcador.visitante = predData.goles_visitante
@@ -163,7 +165,7 @@ export default defineComponent({
         async guardar() {
 
 
-            await fetch(
+            const res = await fetch(
                 `${API_BASE_URL}/apuestas/ecuador-fase`,
                 {
                     method: 'POST',
@@ -188,6 +190,22 @@ export default defineComponent({
                 })
 
 
+            const data = await res.json()
+
+
+            if (res.status === 403) {
+
+                alert(data.message)
+
+                this.locked = true
+
+                return
+            }
+
+
+            this.locked = true
+
+
             alert('Marcador guardado')
 
 
@@ -206,12 +224,11 @@ export default defineComponent({
 
 
 <style scoped>
-
 .locked-msg {
 
-    margin-top:15px;
-    color:#0f766e;
-    font-weight:800;
+    margin-top: 15px;
+    color: #0f766e;
+    font-weight: 800;
 
 }
 
